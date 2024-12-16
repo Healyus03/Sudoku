@@ -14,17 +14,19 @@ public class SudokuSolverImpl implements SudokuSolver {
             return solve(r + 1, 0); // Move to the next row
         }
         if (grid[r][c] != 0) {
-            return solve(r, c + 1); // Skip filled cells
+            if(isValid(r, c)) {
+                return solve(r, c + 1); // Move to the next column
+            }
+            return false;
         }
 
         for (int num = 1; num <= 9; num++) {
-            if (isValid(r, c)) {
-                grid[r][c] = num;
-                if (solve(r, c + 1)) {
-                    return true;
-                }
-                grid[r][c] = 0; // Backtrack
+            grid[r][c] = num;
+            if (isValid(r, c) && solve(r, c + 1)) {
+                return true; // Move to the next column
+
             }
+            grid[r][c] = 0; // Backtrack
         }
         return false; // No solution found
     }
@@ -55,22 +57,44 @@ public class SudokuSolverImpl implements SudokuSolver {
 
     @Override
     public boolean isValid(int row, int col) {
+        int num = grid[row][col];
+        for (int i = 0; i < 9; i++) {
+            if (i != col && grid[row][i] == num) {
+                return false;
+            }
+            if (i != row && grid[i][col] == num) {
+                return false;
+            }
+            int boxRow = row - row % 3 + i / 3;
+            int boxCol = col - col % 3 + i % 3;
+            if ((boxRow != row || boxCol != col) && grid[boxRow][boxCol] == num) {
+                return false;
+            }
+        }
+        return true;
 
-        return false;
     }
 
     @Override
     public boolean isAllValid() {
-        return false;
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                if (grid[row][col] != 0 && !isValid(row, col)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
     public void setGrid(int[][] m) {
+        grid = m;
 
     }
 
     @Override
     public int[][] getGrid() {
-        return new int[0][];
+        return grid;
     }
 }

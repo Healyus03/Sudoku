@@ -47,8 +47,16 @@ public class SudokuSolverUI extends JFrame {
                 for (int i = 0; i < 9; i++) {
                     for (int j = 0; j < 9; j++) {
                         String text = cells[i][j].getText();
-                        int value = text.isEmpty() ? 0 : Integer.parseInt(text);
-                        solver.set(i, j, value);
+                        if (!text.isEmpty()) {
+                            int value = Integer.parseInt(text);
+                            if (value < 1 || value > 9) {
+                                throw new NumberFormatException();
+                            }
+                            solver.set(i, j, value);
+                        } else {
+                            solver.set(i, j, 0);
+                        }
+
                     }
                 }
                 if (solver.solve()) {
